@@ -27,7 +27,7 @@ io.on('connection', (socket) => {
 
 app.post('/api/data/player1', (req, res) => {
     const data = req.body;
-    if(data.choice !== "rock" && data.choice !== "paper" && data.choice !== "sccissor") {
+    if(data.choice !== "rock" && data.choice !== "paper" && data.choice !== "scissor") {
         res.json({ status: 'error', message: 'inccorect choice' });
     }
     if(storeData.player1) {
