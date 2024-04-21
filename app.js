@@ -2,21 +2,24 @@
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
-const cors = require('cors'); // Import the CORS middleware
+const cors = require('cors');
 
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 
+const PORT = process.env.PORT || 8000;
+
+// Store player choices
 const storeData = {
-    player1: "",
-    player2: ""
+    player1: null,
+    player2: null
 };
 
 app.use(express.json());
-
 app.use(cors());
 
+// Socket.IO connection handling
 io.on('connection', (socket) => {
     console.log('A user connected');
 
@@ -25,42 +28,42 @@ io.on('connection', (socket) => {
     });
 });
 
-app.post('/api/data/player1', (req, res) => {
-    const data = req.body;
-    if(data.choice !== "rock" && data.choice !== "paper" && data.choice !== "scissors") {
-        res.json({ status: 'error', message: 'inccorect choice' });
-    }
-    if(storeData.player1) {
-        storeData.player2 = data.choice
-        res.json({ status: 'success', message: 'Player2 received successfully' });
+// Game logic function
+function playRound(player1Choice, player2Choice) {
+    if (player1Choice === player2Choice) {
+        return 'draw';
+    } else if (
+        (player1Choice === 'rock' && player2Choice === 'scissors') ||
+        (player1Choice === 'paper' && player2Choice === 'rock') ||
+        (player1Choice === 'scissors' && player2Choice === 'paper')
+    ) {
+        return 'Player1';
     } else {
-        storeData.player1 = data.choice;
-        res.json({ status: 'success', message: 'Player1 received successfully' });
+        return 'Player2';
+    }
+}
+
+// HTTP route for handling player choices
+app.post('/api/data/player', (req, res) => {
+    const choice = req.body.choice;
+
+    if (!['rock', 'paper', 'scissors'].includes(choice)) {
+        return res.status(400).json({ status: 'error', message: 'Incorrect choice' });
     }
 
-    console.log(storeData);
-
-    if(storeData.player1 && storeData.player2) {
-        if(storeData.player1 === "rock" && storeData.player2 === "paper") {
-            res.json({ status: 'success', winner: 'Player2' });
-        } else if (storeData.player1 === "rock" && storeData.player2 === "scissors") {
-            res.json({ status: 'success', winner: 'Player1' });
-        } else if(storeData.player1 === "paper" && storeData.player2 === "rock") {
-            res.json({ status: 'success', winner: 'Player1' });
-        } else if(storeData.player1 === "paper" && storeData.player2 === "scissors") {
-            res.json({ status: 'success', winner: 'Player2' });
-        } else if(storeData.player1 === storeData.player2) {
-            res.json({ status: 'success', winner: 'draw' });
-        }
-        storeData.player1 = "";
-        storeData.player2 = "";
+    if (storeData.player1 !== null) {
+        storeData.player2 = choice;
+        const result = playRound(storeData.player1, storeData.player2);
+        io.emit('gameResult', { winner: result });
+        storeData.player1 = null;
+        storeData.player2 = null;
+        return res.json({ status: 'success', message: `Player 2 choice received. Winner: ${result}` });
+    } else {
+        storeData.player1 = choice;
+        return res.json({ status: 'success', message: 'Player 1 choice received.' });
     }
 });
 
-app.options('*', cors());
-
-
-const PORT = process.env.PORT || 8000;
 server.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
