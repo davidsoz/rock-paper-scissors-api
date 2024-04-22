@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rock Paper Scissors Game</title>
+    <style>
+        body {
+            background-color: #2a3463;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .container {
+            width: 500px;
+            height: 300px;
+            margin: 150px auto;
+            border: 2px solid rgb(218, 197, 81);
+            display: flex;
+            align-items: center;
+            flex-direction: column;
+            background-color: black;
+            justify-content: center;
+            border-radius: 10px;
+            gap: 20px;
+        }
+        button {
+            background-color: #3498db;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.8s, color 0.8s;
+            width: 130px;
+            height: 49px;
+            font-size: 20px;
+
+        }
+
+        button:hover {
+            border: 2px solid gold;
+            background-color: rgb(68, 97, 26);
+        }
+
+        h1 {
+            color: gold;
+            text-align: center;
+        }
+
+        #buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        #result {
+            width: 259px;
+            padding: 15px;
+            position: absolute;
+            top: 60%;
+            left: 45%;
+            color: wheat;
+            font-size: 25px;
+            text-transform: uppercase;
+        }
+        .winner {
+            background-color: rgb(92, 39, 110);
+        }
+    </style>
+</head>
+
+<body >
+    <div class="container">
+        <h1>Rock Paper Scissors <br> Game</h1>
+        <div id="buttons">
+            <button onclick="submitChoice('rock')">Rock</button>
+            <button onclick="submitChoice('paper')">Paper</button>
+            <button onclick="submitChoice('scissors')">Scissors</button>
+        </div>
+    </div>
+
+
+    <div id="result"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.1/socket.io.js"></script>
+    <script>
+        const socket = io();
+
+        function submitChoice(choice) {
+            console.log('Choice submitted:', choice);
+            socket.emit('choice', { choice });
+        }
+
+        socket.on('gameResult', function(data) {
+            const resultDiv = document.getElementById('result');
+            if (resultDiv.innerHTML != " ") {
+                resultDiv.classList.add('winner')
+            }
+            resultDiv.innerHTML = `
+                <p>Player 1: ${data.player1}</p>
+                <p>Player 2: ${data.player2}</p>
+                <p>Winner: ${data.winner}</p>
+            `;
+        });
+    </script>
+</body>
+</html>
