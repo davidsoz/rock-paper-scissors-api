@@ -67,8 +67,14 @@ function determineWinner(player1Choice, player2Choice, player3Choice) {
     return 'draw';
   } else if ((player1Choice === 'rock' && player2Choice === 'paper' && player3Choice === 'paper') ||
     (player1Choice === 'paper' && player2Choice === 'scissors' && player3Choice === 'scissors') ||
-    (player1Choice === 'scissors' && player2Choice === 'rock' && player3Choice === 'rock')|| 
-    (player1Choice === 'rock' && player2Choice === 'rock' && player3Choice === 'paper') 
+    (player1Choice === 'scissors' && player2Choice === 'rock' && player3Choice === 'rock')||
+    (player1Choice === 'paper' && player2Choice === 'paper' && player3Choice === 'rock')||
+    (player1Choice === 'scissors' && player2Choice === 'paper' && player3Choice === 'scissors')||
+    (player1Choice === 'rock' && player2Choice === 'scissors' && player3Choice === 'rock')||
+    (player1Choice === 'rock' && player2Choice === 'rock' && player3Choice === 'scissors')||
+    (player1Choice === 'paper' && player2Choice === 'rock' && player3Choice === 'paper')||
+    (player1Choice === 'scissors' && player2Choice === 'scissors' && player3Choice === 'paper')
+   
     ) {
     return 'draw';
   } else if ((player1Choice === 'rock' && player2Choice === 'scissors' && player3Choice === 'scissors') ||
